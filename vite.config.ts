@@ -21,7 +21,9 @@ function inlineCssPlugin(): Plugin {
 
       for (const [fileName, chunk] of Object.entries(bundle)) {
         if (fileName.endsWith('.css') && chunk.type === 'asset') {
-          cssCode += chunk.source
+          cssCode += typeof chunk.source === 'string'
+            ? chunk.source
+            : Buffer.from(chunk.source).toString('utf8')
           cssFiles.push(fileName)
         }
       }
@@ -33,7 +35,7 @@ function inlineCssPlugin(): Plugin {
 
       // Inject CSS into JS
       if (cssCode) {
-        for (const [_, chunk] of Object.entries(bundle)) {
+        for (const [fileName, chunk] of Object.entries(bundle)) {
           if (chunk.type === 'chunk' && chunk.isEntry) {
             const injectCode = `
 (function() {
