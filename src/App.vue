@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CommandPalette from '@/components/CommandPalette.vue'
+import CommandPalette from "@/components/CommandPalette.vue";
 </script>
 
 <template>

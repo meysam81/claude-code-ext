@@ -14,17 +14,20 @@ A lightweight Chrome extension that enhances the Claude Code web UI with additio
 ### From Source (Development)
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/meysam81/claude-code-ext.git
    cd claude-code-ext
    ```
 
 2. Install dependencies:
+
    ```bash
    bun install
    ```
 
 3. Build the extension:
+
    ```bash
    bun run build
    ```
@@ -38,6 +41,7 @@ A lightweight Chrome extension that enhances the Claude Code web UI with additio
 ### Optional: Generate Icons
 
 If you want custom icons, run:
+
 ```bash
 chmod +x scripts/generate-icons.sh
 ./scripts/generate-icons.sh
@@ -106,6 +110,7 @@ claude-code-ext/
 ## Roadmap
 
 See [ROADMAP.md](./ROADMAP.md) for planned features including:
+
 - Session bookmarks/favorites
 - Custom tags and labels
 - Session export

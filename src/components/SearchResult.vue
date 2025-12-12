@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import type { SearchResult } from '@/types/api'
+import type { SearchResult } from "@/types/api";
 
 interface Props {
-  result: SearchResult
-  isSelected: boolean
-  formatDate: (date: string) => string
+  result: SearchResult;
+  isSelected: boolean;
+  formatDate: (date: string) => string;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  select: []
-  confirm: []
-}>()
+  select: [];
+  confirm: [];
+}>();
 
 function getTitle(): string {
-  return props.result.session.title || 'Untitled Session'
+  return props.result.session.title || "Untitled Session";
 }
 </script>
 
@@ -27,14 +27,8 @@ function getTitle(): string {
     @click="emit('confirm')"
   >
     <div class="cc-result-icon">
-      <span
-        v-if="result.repoName"
-        class="i-lucide-git-branch"
-      />
-      <span
-        v-else
-        class="i-lucide-message-square"
-      />
+      <span v-if="result.repoName" class="i-lucide-git-branch" />
+      <span v-else class="i-lucide-message-square" />
     </div>
 
     <div class="cc-result-content">

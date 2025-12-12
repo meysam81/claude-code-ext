@@ -1,91 +1,51 @@
-import { defineConfig, type Plugin } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import UnoCSS from 'unocss/vite'
-import { resolve } from 'path'
-
-// Build mode from environment
-const isBackground = process.env.BUILD_TARGET === 'background'
-
-/**
- * Plugin to inline CSS into JS for Chrome extension content scripts
- * This ensures styles are properly injected when the content script loads
- */
-function inlineCssPlugin(): Plugin {
-  return {
-    name: 'inline-css',
-    enforce: 'post',
-    generateBundle(_, bundle) {
-      // Find the CSS and JS files
-      let cssCode = ''
-      const cssFiles: string[] = []
-
-      for (const [fileName, chunk] of Object.entries(bundle)) {
-        if (fileName.endsWith('.css') && chunk.type === 'asset') {
-          cssCode += typeof chunk.source === 'string'
-            ? chunk.source
-            : Buffer.from(chunk.source).toString('utf8')
-          cssFiles.push(fileName)
-        }
-      }
-
-      // Remove CSS files from bundle
-      for (const cssFile of cssFiles) {
-        delete bundle[cssFile]
-      }
-
-      // Inject CSS into JS
-      if (cssCode) {
-        for (const [fileName, chunk] of Object.entries(bundle)) {
-          if (chunk.type === 'chunk' && chunk.isEntry) {
-            const injectCode = `
-(function() {
-  const style = document.createElement('style');
-  style.setAttribute('data-claude-code-ext', '');
-  style.textContent = ${JSON.stringify(cssCode)};
-  document.head.appendChild(style);
-})();
-`
-            chunk.code = injectCode + chunk.code
-          }
-        }
-      }
-    },
-  }
-}
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import UnoCSS from "unocss/vite";
+import { crx } from "@crxjs/vite-plugin";
+import { resolve } from "path";
+import manifest from "./manifest.config";
 
 export default defineConfig({
-  plugins: [
-    vue(),
-    UnoCSS(),
-    // Only inline CSS for content script, not background
-    ...(!isBackground ? [inlineCssPlugin()] : []),
-  ],
+  plugins: [crx({ manifest }), vue(), UnoCSS()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
+      "@": resolve(__dirname, "src"),
+    },
+  },
+  server: {
+    host: true,
+    port: 3000,
+    hmr: {
+      protocol: "ws",
+      host: "localhost",
+      port: 3000,
     },
   },
   build: {
-    outDir: 'dist',
-    emptyOutDir: !isBackground, // Only empty on first build (content)
-    target: 'esnext',
-    minify: 'esbuild',
+    target: "esnext",
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+      mangle: true,
+      format: {
+        comments: false,
+      },
+    },
     cssCodeSplit: false,
-    sourcemap: false,
     rollupOptions: {
-      input: isBackground
-        ? { background: resolve(__dirname, 'src/background/index.ts') }
-        : { content: resolve(__dirname, 'src/content/index.ts') },
       output: {
-        entryFileNames: '[name].js',
-        assetFileNames: 'assets/[name][extname]',
-        // Bundle everything into single files for Chrome extension
-        inlineDynamicImports: !isBackground,
-        format: 'iife',
+        assetFileNames: function (assetInfo) {
+          var info = assetInfo.name.split(".");
+          var ext = info[info.length - 1];
+          if (/css/i.test(ext)) {
+            return "assets/style[extname]";
+          }
+          return "assets/[name][extname]";
+        },
       },
     },
   },
-  define: {
-    'process.env.NODE_ENV': JSON.stringify('production'),
-  },
-})
+});

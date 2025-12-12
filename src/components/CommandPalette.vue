@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { useSearch } from '@/composables/useSearch'
-import { useDarkMode } from '@/composables/useDarkMode'
-import SearchResult from './SearchResult.vue'
+import { ref, onMounted, onUnmounted, nextTick } from "vue";
+import { useSearch } from "@/composables/useSearch";
+import { useDarkMode } from "@/composables/useDarkMode";
+import SearchResult from "./SearchResult.vue";
 
-const isOpen = ref(false)
-const inputRef = ref<HTMLInputElement | null>(null)
-const resultsRef = ref<HTMLDivElement | null>(null)
-const { isDark } = useDarkMode()
+const isOpen = ref(false);
+const inputRef = ref<HTMLInputElement | null>(null);
+const resultsRef = ref<HTMLDivElement | null>(null);
+const { isDark } = useDarkMode();
 
 const {
   query,
@@ -23,114 +23,114 @@ const {
   confirmSelection,
   reset,
   prefetchSessions,
-} = useSearch()
+} = useSearch();
 
 function open() {
-  isOpen.value = true
+  isOpen.value = true;
   nextTick(() => {
-    inputRef.value?.focus()
-  })
+    inputRef.value?.focus();
+  });
   // Prefetch sessions when opening
-  prefetchSessions()
+  prefetchSessions();
 }
 
 function close() {
-  isOpen.value = false
-  reset()
+  isOpen.value = false;
+  reset();
 }
 
 function handleConfirmAndClose() {
-  const confirmed = confirmSelection()
+  const confirmed = confirmSelection();
   if (confirmed) {
-    close()
+    close();
   }
 }
 
 function handleGlobalKeydown(event: KeyboardEvent) {
   // Handle Cmd/Ctrl + K to toggle
-  if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-    event.preventDefault()
-    event.stopPropagation()
+  if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+    event.preventDefault();
+    event.stopPropagation();
     if (isOpen.value) {
-      close()
+      close();
     } else {
-      open()
+      open();
     }
-    return
+    return;
   }
 
   // Only handle other keys when palette is open
-  if (!isOpen.value) return
+  if (!isOpen.value) return;
 
   switch (event.key) {
-    case 'Escape':
-      event.preventDefault()
-      close()
-      break
-    case 'ArrowDown':
-      event.preventDefault()
-      selectNext()
-      scrollSelectedIntoView()
-      break
-    case 'ArrowUp':
-      event.preventDefault()
-      selectPrevious()
-      scrollSelectedIntoView()
-      break
-    case 'Enter':
-      event.preventDefault()
-      handleConfirmAndClose()
-      break
+    case "Escape":
+      event.preventDefault();
+      close();
+      break;
+    case "ArrowDown":
+      event.preventDefault();
+      selectNext();
+      scrollSelectedIntoView();
+      break;
+    case "ArrowUp":
+      event.preventDefault();
+      selectPrevious();
+      scrollSelectedIntoView();
+      break;
+    case "Enter":
+      event.preventDefault();
+      handleConfirmAndClose();
+      break;
   }
 }
 
 function scrollSelectedIntoView() {
   nextTick(() => {
-    const selectedEl = resultsRef.value?.querySelector('.cc-result-selected')
-    selectedEl?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-  })
+    const selectedEl = resultsRef.value?.querySelector(".cc-result-selected");
+    selectedEl?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  });
 }
 
 function handleBackdropClick(event: MouseEvent) {
   if (event.target === event.currentTarget) {
-    close()
+    close();
   }
 }
 
 function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
 
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
 
-  return date.toLocaleDateString()
+  return date.toLocaleDateString();
 }
 
 function handleExtensionOpen() {
-  open()
+  open();
 }
 
 // Expose open method for external access
-defineExpose({ open, close })
+defineExpose({ open, close });
 
 onMounted(() => {
   // Listen for global keyboard events (handles both Ctrl+K and navigation)
-  document.addEventListener('keydown', handleGlobalKeydown, true)
+  document.addEventListener("keydown", handleGlobalKeydown, true);
   // Listen for extension message to open palette
-  window.addEventListener('claude-code-ext:open', handleExtensionOpen)
-})
+  window.addEventListener("claude-code-ext:open", handleExtensionOpen);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleGlobalKeydown, true)
-  window.removeEventListener('claude-code-ext:open', handleExtensionOpen)
-})
+  document.removeEventListener("keydown", handleGlobalKeydown, true);
+  window.removeEventListener("claude-code-ext:open", handleExtensionOpen);
+});
 </script>
 
 <template>
@@ -403,7 +403,9 @@ onUnmounted(() => {
 
 .fade-enter-active .cc-palette,
 .fade-leave-active .cc-palette {
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .fade-enter-from .cc-palette,

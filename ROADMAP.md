@@ -16,18 +16,21 @@ This document outlines the planned features and improvements for the Claude Code
 ### Phase 1: Enhanced Session Management
 
 #### Session Bookmarks/Favorites
+
 **Priority**: High
 **Complexity**: Medium
 
 Allow users to bookmark frequently accessed sessions for quick access.
 
 **Implementation Details**:
+
 - Add star/bookmark icon to search results
 - Create a "Favorites" section at the top of results when query is empty
 - Store favorites in `chrome.storage.sync` for cross-device sync
 - Add keyboard shortcut (`Cmd/Ctrl + D`) to toggle bookmark on selected session
 
 **Files to modify**:
+
 - `src/types/api.ts` - Add `BookmarkedSession` type
 - `src/services/storage.ts` - Create new storage service for bookmarks
 - `src/composables/useBookmarks.ts` - New composable for bookmark management
@@ -37,12 +40,14 @@ Allow users to bookmark frequently accessed sessions for quick access.
 ---
 
 #### Session Tags/Labels
+
 **Priority**: Medium
 **Complexity**: High
 
 Enable users to organize sessions with custom tags for better categorization.
 
 **Implementation Details**:
+
 - Create tag management UI (add/remove/edit tags)
 - Support color-coded tags
 - Filter sessions by tags in search
@@ -50,6 +55,7 @@ Enable users to organize sessions with custom tags for better categorization.
 - Support tag autocomplete when filtering
 
 **Files to modify**:
+
 - `src/types/api.ts` - Add `Tag` and `SessionTag` types
 - `src/services/storage.ts` - Add tag storage methods
 - `src/composables/useTags.ts` - New composable for tag management
@@ -60,18 +66,21 @@ Enable users to organize sessions with custom tags for better categorization.
 ---
 
 #### Quick Session Deletion
+
 **Priority**: Low
 **Complexity**: Medium
 
 Allow users to delete sessions directly from the command palette.
 
 **Implementation Details**:
+
 - Add delete action (with confirmation) to search results
 - Implement Claude API call for session deletion
 - Add keyboard shortcut (`Cmd/Ctrl + Backspace`) for delete action
 - Show success/error toast notification
 
 **Files to modify**:
+
 - `src/services/claude-api.ts` - Add `deleteSession` method
 - `src/components/SearchResult.vue` - Add delete button
 - `src/components/ConfirmDialog.vue` - New confirmation dialog component
@@ -82,24 +91,28 @@ Allow users to delete sessions directly from the command palette.
 ### Phase 2: Data Export & Import
 
 #### Session Export
+
 **Priority**: Medium
 **Complexity**: High
 
 Export session data for backup or analysis purposes.
 
 **Implementation Details**:
+
 - Export formats: JSON, Markdown, CSV
 - Export options: single session, filtered results, all sessions
 - Include session metadata (title, repo, dates, conversation history)
 - Batch export with progress indicator
 
 **Files to modify**:
+
 - `src/services/claude-api.ts` - Add methods to fetch full session data
 - `src/services/export.ts` - New export service with format handlers
 - `src/components/ExportDialog.vue` - New export configuration dialog
 - `src/components/CommandPalette.vue` - Add export action
 
 **API Considerations**:
+
 - May need to fetch individual session conversations
 - Implement rate limiting to avoid API throttling
 - Consider chunked downloads for large exports
@@ -109,18 +122,21 @@ Export session data for backup or analysis purposes.
 ### Phase 3: Advanced Features
 
 #### Recent Sessions List
+
 **Priority**: High
 **Complexity**: Low
 
 Show recently accessed sessions for quick navigation.
 
 **Implementation Details**:
+
 - Track session access in local storage
 - Show top 5-10 recent sessions when palette opens with empty query
 - Clear recent history option
 - Pin sessions to keep them in recent list
 
 **Files to modify**:
+
 - `src/services/storage.ts` - Add recent sessions tracking
 - `src/composables/useRecent.ts` - New composable for recent sessions
 - `src/components/CommandPalette.vue` - Add recent sessions section
@@ -128,12 +144,14 @@ Show recently accessed sessions for quick navigation.
 ---
 
 #### Session Statistics Dashboard
+
 **Priority**: Low
 **Complexity**: High
 
 Display usage statistics and insights about Claude Code sessions.
 
 **Implementation Details**:
+
 - Total sessions count
 - Sessions per repository
 - Activity timeline/heatmap
@@ -141,6 +159,7 @@ Display usage statistics and insights about Claude Code sessions.
 - Session duration estimates
 
 **Files to modify**:
+
 - `src/services/analytics.ts` - New analytics computation service
 - `src/components/StatsDashboard.vue` - New dashboard component
 - `src/components/CommandPalette.vue` - Add stats mode toggle
@@ -148,18 +167,21 @@ Display usage statistics and insights about Claude Code sessions.
 ---
 
 #### Global Search Across Conversations
+
 **Priority**: Medium
 **Complexity**: Very High
 
 Search within conversation content, not just titles and repos.
 
 **Implementation Details**:
+
 - Index conversation content locally
 - Full-text search with highlighting
 - Search result previews with context
 - Performance optimization for large histories
 
 **Technical Considerations**:
+
 - May require background indexing
 - Consider using Web Workers for search
 - Implement incremental indexing
@@ -168,18 +190,21 @@ Search within conversation content, not just titles and repos.
 ---
 
 #### Keyboard Shortcut Customization
+
 **Priority**: Low
 **Complexity**: Medium
 
 Allow users to customize keyboard shortcuts.
 
 **Implementation Details**:
+
 - Settings page for shortcut configuration
 - Conflict detection with existing Claude shortcuts
 - Reset to defaults option
 - Export/import shortcut configuration
 
 **Files to modify**:
+
 - `src/services/settings.ts` - New settings management service
 - `src/components/SettingsPage.vue` - New settings page component
 - `public/manifest.json` - Update to support configurable commands
@@ -190,24 +215,28 @@ Allow users to customize keyboard shortcuts.
 ## Technical Debt & Improvements
 
 ### Performance Optimization
+
 - [ ] Implement virtual scrolling for large result sets
 - [ ] Add request caching with service worker
 - [ ] Lazy load components
 - [ ] Optimize bundle size with dynamic imports
 
 ### Testing
+
 - [ ] Add unit tests with Vitest
 - [ ] Add E2E tests with Playwright
 - [ ] Set up CI/CD pipeline
 - [ ] Add visual regression tests
 
 ### Accessibility
+
 - [ ] ARIA labels and roles
 - [ ] Screen reader support
 - [ ] High contrast mode
 - [ ] Reduce motion option
 
 ### Documentation
+
 - [ ] User guide with screenshots
 - [ ] Developer documentation
 - [ ] Contributing guidelines
@@ -255,6 +284,7 @@ bun run lint
 ## Version History
 
 ### v1.0.0 (Current)
+
 - Initial release
 - Session search by title and repository
 - Keyboard navigation
