@@ -93,8 +93,9 @@ export function useSearch() {
   async function prefetchSessions() {
     try {
       await claudeApi.getSessions()
-    } catch {
-      // Silently fail prefetch
+    } catch (err) {
+      // Silently fail prefetch, but log error for debugging
+      console.error('Prefetch sessions failed:', err)
     }
   }
 

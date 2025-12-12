@@ -25,7 +25,7 @@ class ClaudeApiService {
     })
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch organization: ${response.status}`)
+      throw new Error(`Failed to fetch organization: ${response.status} ${response.statusText}. Please check your authentication status or try logging in again.`)
     }
 
     const orgs: Organization[] = await response.json()
@@ -86,12 +86,23 @@ class ClaudeApiService {
     const sources = session.session_context?.sources
     if (!sources?.length) return null
 
-    const url = sources[0].url
-    if (!url) return null
+    const urlStr = sources[0].url
+    if (!urlStr) return null
 
-    const parts = url.split('/')
-    const repoWithGit = parts.pop() || ''
-    return repoWithGit.replace('.git', '')
+    try {
+      const url = new URL(urlStr)
+      // Remove trailing slash, then split path
+      const path = url.pathname.replace(/\/+$/, '')
+      const segments = path.split('/').filter(Boolean)
+      if (segments.length === 0) return null
+      let repo = segments[segments.length - 1]
+      // Remove .git suffix if present
+      repo = repo.replace(/\.git$/, '')
+      return repo || null
+    } catch (e) {
+      // Invalid URL
+      return null
+    }
   }
 
   /**
@@ -139,7 +150,10 @@ class ClaudeApiService {
    * Navigate to a specific session
    */
   navigateToSession(sessionUuid: string): void {
-    window.location.href = `${BASE_URL}/code/${sessionUuid}`
+    const url = `${BASE_URL}/code/${sessionUuid}`;
+    if (window.confirm('You are about to leave the current page and navigate to the session. Continue?')) {
+      window.location.href = url;
+    }
   }
 
   /**
