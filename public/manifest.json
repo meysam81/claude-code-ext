@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Enhanced utilities for Claude Code web UI - Quick session search, keyboard shortcuts, and more.",
   "author": "Claude Code Ext Contributors",
-  "homepage_url": "https://github.com/anthropics/claude-code-ext",
+  "homepage_url": "https://github.com/meysam81/claude-code-ext",
   "permissions": [
     "storage",
     "activeTab"

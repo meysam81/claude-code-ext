@@ -15,7 +15,7 @@ A lightweight Chrome extension that enhances the Claude Code web UI with additio
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/anthropics/claude-code-ext.git
+   git clone https://github.com/meysam81/claude-code-ext.git
    cd claude-code-ext
    ```
 
