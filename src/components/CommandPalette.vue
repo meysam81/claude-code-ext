@@ -6,6 +6,7 @@ import SearchResult from './SearchResult.vue'
 
 const isOpen = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
+const resultsRef = ref<HTMLDivElement | null>(null)
 const { isDark } = useDarkMode()
 
 const {
@@ -38,7 +39,27 @@ function close() {
   reset()
 }
 
-function handleKeydown(event: KeyboardEvent) {
+function handleConfirmAndClose() {
+  const confirmed = confirmSelection()
+  if (confirmed) {
+    close()
+  }
+}
+
+function handleGlobalKeydown(event: KeyboardEvent) {
+  // Handle Cmd/Ctrl + K to toggle
+  if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+    event.preventDefault()
+    event.stopPropagation()
+    if (isOpen.value) {
+      close()
+    } else {
+      open()
+    }
+    return
+  }
+
+  // Only handle other keys when palette is open
   if (!isOpen.value) return
 
   switch (event.key) {
@@ -49,30 +70,25 @@ function handleKeydown(event: KeyboardEvent) {
     case 'ArrowDown':
       event.preventDefault()
       selectNext()
+      scrollSelectedIntoView()
       break
     case 'ArrowUp':
       event.preventDefault()
       selectPrevious()
+      scrollSelectedIntoView()
       break
     case 'Enter':
       event.preventDefault()
-      confirmSelection()
-      close()
+      handleConfirmAndClose()
       break
   }
 }
 
-function handleGlobalKeydown(event: KeyboardEvent) {
-  // Cmd/Ctrl + K to toggle
-  if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-    event.preventDefault()
-    event.stopPropagation()
-    if (isOpen.value) {
-      close()
-    } else {
-      open()
-    }
-  }
+function scrollSelectedIntoView() {
+  nextTick(() => {
+    const selectedEl = resultsRef.value?.querySelector('.cc-result-selected')
+    selectedEl?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  })
 }
 
 function handleBackdropClick(event: MouseEvent) {
@@ -97,15 +113,23 @@ function formatDate(dateString: string): string {
   return date.toLocaleDateString()
 }
 
+function handleExtensionOpen() {
+  open()
+}
+
 // Expose open method for external access
 defineExpose({ open, close })
 
 onMounted(() => {
+  // Listen for global keyboard events (handles both Ctrl+K and navigation)
   document.addEventListener('keydown', handleGlobalKeydown, true)
+  // Listen for extension message to open palette
+  window.addEventListener('claude-code-ext:open', handleExtensionOpen)
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleGlobalKeydown, true)
+  window.removeEventListener('claude-code-ext:open', handleExtensionOpen)
 })
 </script>
 
@@ -117,7 +141,6 @@ onUnmounted(() => {
         class="cc-backdrop"
         :class="{ dark: isDark }"
         @click="handleBackdropClick"
-        @keydown="handleKeydown"
       >
         <div class="cc-palette">
           <!-- Search Input -->
@@ -141,7 +164,7 @@ onUnmounted(() => {
           <div class="cc-divider" />
 
           <!-- Results -->
-          <div class="cc-results">
+          <div ref="resultsRef" class="cc-results">
             <!-- Loading State -->
             <div v-if="isLoading" class="cc-state">
               <span class="cc-spinner" />
@@ -172,7 +195,7 @@ onUnmounted(() => {
                 :is-selected="index === selectedIndex"
                 :format-date="formatDate"
                 @select="selectResult(index)"
-                @confirm="confirmSelection(); close()"
+                @confirm="handleConfirmAndClose()"
               />
             </template>
           </div>

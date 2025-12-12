@@ -76,11 +76,13 @@ export function useSearch() {
     }
   }
 
-  function confirmSelection() {
+  function confirmSelection(): boolean {
     const selected = selectedResult.value
-    if (selected) {
+    if (selected?.session?.uuid) {
       claudeApi.navigateToSession(selected.session.uuid)
+      return true
     }
+    return false
   }
 
   function reset() {

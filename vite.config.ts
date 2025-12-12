@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import UnoCSS from 'unocss/vite'
 import { resolve } from 'path'
@@ -6,10 +6,59 @@ import { resolve } from 'path'
 // Build mode from environment
 const isBackground = process.env.BUILD_TARGET === 'background'
 
+/**
+ * Plugin to inline CSS into JS for Chrome extension content scripts
+ * This ensures styles are properly injected when the content script loads
+ */
+function inlineCssPlugin(): Plugin {
+  return {
+    name: 'inline-css',
+    enforce: 'post',
+    generateBundle(_, bundle) {
+      // Find the CSS and JS files
+      let cssCode = ''
+      const cssFiles: string[] = []
+
+      for (const [fileName, chunk] of Object.entries(bundle)) {
+        if (fileName.endsWith('.css') && chunk.type === 'asset') {
+          cssCode += typeof chunk.source === 'string'
+            ? chunk.source
+            : Buffer.from(chunk.source).toString('utf8')
+          cssFiles.push(fileName)
+        }
+      }
+
+      // Remove CSS files from bundle
+      for (const cssFile of cssFiles) {
+        delete bundle[cssFile]
+      }
+
+      // Inject CSS into JS
+      if (cssCode) {
+        for (const [fileName, chunk] of Object.entries(bundle)) {
+          if (chunk.type === 'chunk' && chunk.isEntry) {
+            const injectCode = `
+(function() {
+  const style = document.createElement('style');
+  style.setAttribute('data-claude-code-ext', '');
+  style.textContent = ${JSON.stringify(cssCode)};
+  document.head.appendChild(style);
+})();
+`
+            chunk.code = injectCode + chunk.code
+          }
+        }
+      }
+    },
+  }
+}
+
 export default defineConfig({
   plugins: [
     vue(),
     UnoCSS(),
+    // Only inline CSS for content script, not background
+    ...(!isBackground ? [inlineCssPlugin()] : []),
   ],
   resolve: {
     alias: {
