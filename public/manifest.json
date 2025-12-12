@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Claude Code Utilities",
+  "version": "1.0.0",
+  "description": "Enhanced utilities for Claude Code web UI - Quick session search, keyboard shortcuts, and more.",
+  "author": "Claude Code Ext Contributors",
+  "homepage_url": "https://github.com/meysam81/claude-code-ext",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://claude.ai/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://claude.ai/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "open-command-palette": {
+      "suggested_key": {
+        "default": "Ctrl+K",
+        "mac": "Command+K"
+      },
+      "description": "Open the command palette"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["https://claude.ai/*"]
+    }
+  ],
+  "minimum_chrome_version": "110"
+}
