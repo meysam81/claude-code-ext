@@ -150,10 +150,12 @@ class ClaudeApiService {
    * Navigate to a specific session
    */
   navigateToSession(sessionUuid: string): void {
-    const url = `${BASE_URL}/code/${sessionUuid}`;
-    if (window.confirm('You are about to leave the current page and navigate to the session. Continue?')) {
-      window.location.href = url;
+    if (!sessionUuid || sessionUuid === 'undefined') {
+      console.error('[Claude Code Ext] Cannot navigate: invalid session UUID')
+      return
     }
+    const url = `${BASE_URL}/code/${sessionUuid}`
+    window.location.href = url
   }
 
   /**
